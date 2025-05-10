@@ -1,19 +1,47 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { loginSuccess } from "../store/authSlice";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { login, clearError } from "../store/authSlice";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState("");
 
-  const handleLogin = (e) => {
+  const validateForm = () => {
+    if (!email.trim()) {
+      setFormError("Email is required");
+      return false;
+    }
+    if (!password) {
+      setFormError("Password is required");
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    dispatch(loginSuccess({ user: { email }, token: "mock-token" }));
-    navigate("/");
+    setFormError("");
+    dispatch(clearError());
+
+    if (!validateForm()) return;
+
+    const result = await dispatch(login({ email, password }));
+    if (!result.error) {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -43,6 +71,11 @@ const Login = () => {
             Welcome Back
           </h2>
           <form onSubmit={handleLogin} className="space-y-6">
+            {(formError || error) && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {formError || error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2 text-indigo-900">
                 Email
@@ -71,9 +104,12 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200 mt-4"
+              disabled={loading}
+              className={`w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200 mt-4 ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Log In
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
           <p className="mt-8 text-center text-indigo-800/70">

@@ -1,20 +1,54 @@
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { register, clearError } from "../store/authSlice";
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+  const [formError, setFormError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSignup = (e) => {
+  const validateForm = () => {
+    if (!form.name.trim()) {
+      setFormError("Name is required");
+      return false;
+    }
+    if (!form.email.trim()) {
+      setFormError("Email is required");
+      return false;
+    }
+    if (!form.password || form.password.length < 6) {
+      setFormError("Password must be at least 6 characters");
+      return false;
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
+  const handleSignup = async (e) => {
     e.preventDefault();
-    console.log("Signup form submitted:", form);
-    // You can dispatch signup logic here
-    navigate("/login");
+    setFormError("");
+    dispatch(clearError());
+
+    if (!validateForm()) return;
+
+    const result = await dispatch(register(form));
+    if (!result.error) {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -44,6 +78,11 @@ const Signup = () => {
             Create Account
           </h2>
           <form onSubmit={handleSignup} className="space-y-6">
+            {(formError || error) && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {formError || error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium mb-2 text-indigo-900">
                 Name
@@ -88,9 +127,12 @@ const Signup = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200 mt-4"
+              disabled={loading}
+              className={`w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200 mt-4 ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
           <p className="mt-8 text-center text-indigo-800/70">

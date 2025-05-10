@@ -1,5 +1,6 @@
-import { useState } from "react";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 const RoleDashboard = () => {

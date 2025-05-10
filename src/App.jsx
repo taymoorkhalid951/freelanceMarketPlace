@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -7,18 +9,53 @@ import SearchServices from "./components/buyer/SearchServices";
 import BuyerDashboard from "./components/buyer/BuyerDashboard";
 import ServiceDetail from "./pages/ServiceDetail";
 import HomePage from "./pages/HomePage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { fetchCurrentUser } from "./store/authSlice";
+import { isAuthenticated } from "./utils/authUtils";
 
 function App() {
+  const dispatch = useDispatch();
+
+  // Check for authentication on app startup
+  useEffect(() => {
+    if (isAuthenticated()) {
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/dashboard" element={<RoleDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/buyer" element={<BuyerDashboard />} />
-        <Route path="/search" element={<SearchServices />} />
         <Route path="/service/:id" element={<ServiceDetail />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <RoleDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buyer"
+          element={
+            <ProtectedRoute>
+              <BuyerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <SearchServices />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
