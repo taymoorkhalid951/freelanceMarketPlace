@@ -9,6 +9,7 @@ import SearchServices from "./components/buyer/SearchServices";
 import BuyerDashboard from "./components/buyer/BuyerDashboard";
 import ServiceDetail from "./pages/ServiceDetail";
 import HomePage from "./pages/HomePage";
+import AddService from "./pages/AddService";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { fetchCurrentUser } from "./store/authSlice";
 import { isAuthenticated } from "./utils/authUtils";
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SearchServices />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add-service"
+          element={
+            <ProtectedRoute>
+              <AddService />
             </ProtectedRoute>
           }
         />

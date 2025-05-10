@@ -43,9 +43,12 @@ const RoleDashboard = () => {
           <h1 className="text-4xl font-bold text-indigo-900">
             {role === "buyer" ? "Buyer Dashboard" : "Seller Dashboard"}
           </h1>
-          <button className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-xl hover:shadow-indigo-200 text-lg">
+          <Link
+            to="/add-service"
+            className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-xl hover:shadow-indigo-200 text-lg inline-block"
+          >
             + Add New Service
-          </button>
+          </Link>
         </div>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">

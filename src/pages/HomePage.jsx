@@ -75,19 +75,19 @@ const HomePage = () => {
         transition={{ duration: 0.7, delay: 0.2 }}
         className="py-32 bg-gradient-to-br from-white to-indigo-50"
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-9/10 mx-auto px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold mb-6 text-indigo-900">
+            <h2 className="text-5xl font-bold mb-8 text-indigo-900">
               Find the Right Freelancer for Any Task
             </h2>
-            <p className="text-xl text-indigo-800/70 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-2xl text-indigo-800/70 max-w-4xl mx-auto leading-relaxed">
               Browse thousands of skilled professionals ready to work on your
               next project and bring your ideas to life
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-10 mb-16">
-            {[1, 2, 3].map((id) => (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
+            {[1, 2, 3, 2, 1].map((id) => (
               <ServiceCard key={id} id={id} />
             ))}
           </div>
