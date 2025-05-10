@@ -23,21 +23,23 @@ const SearchServices = () => {
   const filteredResults = [1, 2, 3, 4]; // Dummy service cards
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-blue-600 px-4 py-8 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto px-6 py-12"
       >
-        <h1 className="text-3xl font-semibold mb-6">Search Services</h1>
+        <h1 className="text-4xl font-bold text-indigo-900 mb-8">
+          Search Services
+        </h1>
 
-        <div className="bg-white/10 p-6 rounded-2xl backdrop-blur-md shadow-xl">
+        <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-indigo-50">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             <input
               type="text"
               placeholder="Search services..."
-              className="col-span-2 bg-white/20 text-white placeholder-white/70 py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-white"
+              className="col-span-2 bg-white/80 text-indigo-900 placeholder-indigo-400 py-3 px-4 rounded-xl border border-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -46,7 +48,7 @@ const SearchServices = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="appearance-none w-full bg-white/20 text-white py-3 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-white pr-10"
+                className="appearance-none w-full bg-white/80 text-indigo-900 py-3 px-4 rounded-xl border border-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
               >
                 <option value="" className="text-gray-800">
                   All Categories
@@ -64,7 +66,7 @@ const SearchServices = () => {
               {/* Custom dropdown arrow */}
               <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
                 <svg
-                  className="w-4 h-4 text-white"
+                  className="w-4 h-4 text-indigo-600"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -83,7 +85,7 @@ const SearchServices = () => {
           </div>
 
           {filteredResults.length === 0 && (
-            <p className="text-center text-white/80 mt-10">
+            <p className="text-center text-indigo-600/80 mt-10">
               No services found.
             </p>
           )}
