@@ -6,12 +6,14 @@ import RoleDashboard from "./pages/RoleDashboard";
 import SearchServices from "./components/buyer/SearchServices";
 import BuyerDashboard from "./components/buyer/BuyerDashboard";
 import ServiceDetail from "./pages/ServiceDetail";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<RoleDashboard />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/dashboard" element={<RoleDashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/buyer" element={<BuyerDashboard />} />
