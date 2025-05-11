@@ -102,7 +102,11 @@ const serviceSlice = createSlice({
       })
       .addCase(fetchServices.fulfilled, (state, action) => {
         state.loading = false;
-        state.services = action.payload.services;
+        if (action.meta.arg.page && action.meta.arg.page > 1) {
+          state.services = [...state.services, ...action.payload.services];
+        } else {
+          state.services = action.payload.services;
+        }
         state.pagination = {
           page: action.payload.page,
           pages: action.payload.pages,

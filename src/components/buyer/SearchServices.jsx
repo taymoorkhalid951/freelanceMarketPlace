@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
+import { debounce } from "lodash";
 import ServiceCard from "./ServiceCard";
+import { fetchServices } from "../../store/serviceSlice";
+import { SkeletonLoading } from "../SkeletonLoading";
 
 const categories = [
   "Design",
@@ -13,14 +17,48 @@ const categories = [
 
 const SearchServices = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+
   const searchParams = new URLSearchParams(location.search);
   const defaultCategory = searchParams.get("category") || "";
 
+  const { services, pagination, loading } = useSelector(
+    (state) => state.services
+  );
+
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(defaultCategory);
+  const [page, setPage] = useState(1);
 
-  // Fake results (can be replaced with API data)
-  const filteredResults = [1, 2, 3, 4]; // Dummy service cards
+  // Debounced fetch function
+  const debouncedFetch = useCallback(
+    debounce((params) => {
+      dispatch(fetchServices(params));
+    }, 500),
+    []
+  );
+
+  // Fetch on search or category change
+  useEffect(() => {
+    setPage(1);
+    debouncedFetch({ page: 1, keyword: query, category });
+  }, [query, category]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
+      if (bottom && !loading && page < pagination.pages) {
+        const nextPage = page + 1;
+        setPage(nextPage);
+        dispatch(fetchServices({ page: nextPage, keyword: query, category }));
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [page, query, category, loading, pagination.pages]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
@@ -34,7 +72,7 @@ const SearchServices = () => {
           Search Services
         </h1>
 
-        <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-indigo-50">
+        <div className="bg-white/80 p-8 rounded-2xl shadow-xl border border-indigo-100 backdrop-blur-md">
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
             <input
               type="text"
@@ -50,20 +88,13 @@ const SearchServices = () => {
                 onChange={(e) => setCategory(e.target.value)}
                 className="appearance-none w-full bg-white/80 text-indigo-900 py-3 px-4 rounded-xl border border-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
               >
-                <option value="" className="text-gray-800">
-                  All Categories
-                </option>
+                <option value="">All Categories</option>
                 {categories.map((cat) => (
-                  <option
-                    key={cat}
-                    value={cat.toLowerCase()}
-                    className="text-gray-800"
-                  >
+                  <option key={cat} value={cat.toLowerCase()}>
                     {cat}
                   </option>
                 ))}
               </select>
-              {/* Custom dropdown arrow */}
               <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
                 <svg
                   className="w-4 h-4 text-indigo-600"
@@ -79,16 +110,20 @@ const SearchServices = () => {
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {filteredResults.map((id) => (
-              <ServiceCard key={id} id={id} />
+            {services.map((service) => (
+              <ServiceCard key={service._id} {...service} />
             ))}
           </div>
 
-          {filteredResults.length === 0 && (
+          {services.length === 0 && !loading && (
             <p className="text-center text-indigo-600/80 mt-10">
               No services found.
             </p>
           )}
+          {loading &&
+            Array.from({ length: 6 }).map((_, idx) => (
+              <SkeletonLoading key={idx} />
+            ))}
         </div>
       </motion.div>
     </div>

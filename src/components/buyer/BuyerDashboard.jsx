@@ -15,7 +15,7 @@ const BuyerDashboard = () => {
             <span className="text-indigo-600">Serv</span>ico
           </Link>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/dashboard")}
             className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
           >
             Switch to Seller

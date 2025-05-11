@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000/api";
+const API_URL = "http://localhost:4000/api/services";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -22,7 +22,7 @@ api.interceptors.request.use(
 
 const createService = async (serviceData) => {
   try {
-    const response = await api.post("/services", serviceData);
+    const response = await api.post("/", serviceData);
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Service creation failed" };
