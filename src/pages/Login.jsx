@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login, clearError } from "../store/authSlice";
+import { isAuthenticated } from "../utils/authUtils";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,6 +27,9 @@ const Login = () => {
   };
 
   useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/dashboard");
+    }
     return () => {
       dispatch(clearError());
     };

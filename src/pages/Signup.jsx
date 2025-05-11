@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { register, clearError } from "../store/authSlice";
+import { isAuthenticated } from "../utils/authUtils";
 
 const Signup = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -33,6 +34,9 @@ const Signup = () => {
   };
 
   useEffect(() => {
+    if (isAuthenticated()) {
+      navigate("/dashboard");
+    }
     return () => {
       dispatch(clearError());
     };

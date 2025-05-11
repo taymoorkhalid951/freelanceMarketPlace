@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchServciesByUserId, deleteService } from "../store/serviceSlice";
+import { fetchServciesByUserId } from "../store/serviceSlice";
 import ServiceCard from "../components/buyer/ServiceCard";
+import { fetchCurrentUser, logout } from "../store/authSlice";
 
 const RoleDashboard = () => {
   const [role, setRole] = useState("seller");
@@ -12,6 +13,12 @@ const RoleDashboard = () => {
   const dispatch = useDispatch();
   const { services, loading, error } = useSelector((state) => state.services);
   const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (!user) {
+      dispatch(fetchCurrentUser());
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -29,15 +36,6 @@ const RoleDashboard = () => {
     });
   };
 
-  const handleDelete = async (serviceId) => {
-    if (window.confirm("Are you sure you want to delete this service?")) {
-      const result = await dispatch(deleteService(serviceId));
-      if (!result.error) {
-        dispatch(fetchServciesByUserId(user._id));
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
       {/* Navbar */}
@@ -46,12 +44,23 @@ const RoleDashboard = () => {
           <Link to="/" className="text-3xl font-bold text-indigo-900">
             <span className="text-indigo-600">Serv</span>ico
           </Link>
-          <button
-            onClick={toggleRole}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
-          >
-            Switch to {role === "buyer" ? "Seller" : "Buyer"}
-          </button>
+          <div>
+            <button
+              onClick={() => {
+                dispatch(logout());
+                navigate("/login");
+              }}
+              className="text-indigo-600 hover:text-indigo-800 font-medium text-lg mr-4"
+            >
+              Logout
+            </button>
+            <button
+              onClick={toggleRole}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
+            >
+              Switch to {role === "buyer" ? "Seller" : "Buyer"}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -85,21 +94,7 @@ const RoleDashboard = () => {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
             {services.map((service) => (
               <div key={service._id} className="relative group">
-                <ServiceCard {...service} />
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                  <Link
-                    to={`/edit-service/${service._id}`}
-                    className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(service._id)}
-                    className="text-red-500 hover:text-red-700 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
-                  >
-                    Delete
-                  </button>
-                </div>
+                <ServiceCard isSeller={true} {...service} />
               </div>
             ))}
           </div>

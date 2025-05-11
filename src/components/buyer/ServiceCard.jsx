@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { deleteService, fetchServciesByUserId } from "../../store/serviceSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const ServiceCard = ({
   _id: id,
@@ -7,8 +9,20 @@ const ServiceCard = ({
   price,
   deliveryTime,
   images,
+  isSeller,
 }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
+  const handleDelete = async (serviceId) => {
+    if (window.confirm("Are you sure you want to delete this service?")) {
+      const result = await dispatch(deleteService(serviceId));
+      if (!result.error) {
+        dispatch(fetchServciesByUserId(user._id));
+      }
+    }
+  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group border border-indigo-50 hover:border-indigo-100">
@@ -25,7 +39,11 @@ const ServiceCard = ({
           <h3 className="text-xl font-semibold text-indigo-900">{title}</h3>
           <span className="text-indigo-600 font-bold">${price}</span>
         </div>
-        <p className="text-indigo-800/70 mb-4">{description}</p>
+        <p className="text-indigo-800/70 mb-4">
+          {description?.length > 25
+            ? `${description.slice(0, 25)}...`
+            : description}
+        </p>
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
             <svg
@@ -41,12 +59,30 @@ const ServiceCard = ({
           </div>
           <span className="text-sm text-indigo-600">Fixed Price</span>
         </div>
-        <button
-          className="w-full bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
-          onClick={() => navigate(`/service/${id}`)}
-        >
-          View Details
-        </button>
+        {!isSeller && (
+          <button
+            className="w-full bg-indigo-600 text-white font-medium py-3 rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
+            onClick={() => navigate(`/service/${id}`)}
+          >
+            View Details
+          </button>
+        )}
+        {isSeller && (
+          <div className=" flex justify-between items-center">
+            <Link
+              to={`/edit-service/${id}`}
+              className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
+            >
+              Edit
+            </Link>
+            <button
+              onClick={() => handleDelete(id)}
+              className="text-red-500 hover:text-red-700 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
+            >
+              Delete
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

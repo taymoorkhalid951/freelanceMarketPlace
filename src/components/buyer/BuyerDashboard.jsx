@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import OrderList from "./OrderList";
 import CategoryGrid from "./CategoryGrid";
 import ServiceCard from "./ServiceCard";
+import { logout } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
 
 const BuyerDashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
@@ -14,12 +17,23 @@ const BuyerDashboard = () => {
           <Link to="/" className="text-3xl font-bold text-indigo-900">
             <span className="text-indigo-600">Serv</span>ico
           </Link>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
-          >
-            Switch to Seller
-          </button>
+          <div>
+            <button
+              onClick={() => {
+                dispatch(logout());
+                navigate("/login");
+              }}
+              className="text-indigo-600 hover:text-indigo-800 font-medium text-lg mr-4"
+            >
+              Logout
+            </button>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200"
+            >
+              Switch to Seller
+            </button>
+          </div>
         </div>
       </nav>
 
