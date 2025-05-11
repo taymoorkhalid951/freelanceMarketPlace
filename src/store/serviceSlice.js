@@ -35,6 +35,17 @@ export const fetchServiceById = createAsyncThunk(
   }
 );
 
+export const fetchServciesByUserId = createAsyncThunk(
+  "services/fetchByUserId",
+  async (userId, { rejectWithValue }) => {
+    try {
+      return await serviceService.getServicesByUserId(userId);
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to fetch services");
+    }
+  }
+);
+
 export const updateService = createAsyncThunk(
   "services/update",
   async ({ id, serviceData }, { rejectWithValue }) => {
@@ -127,6 +138,25 @@ const serviceSlice = createSlice({
         state.currentService = action.payload;
       })
       .addCase(fetchServiceById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchServciesByUserId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchServciesByUserId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.services = action.payload.services || action.payload;
+        if (action.payload.page) {
+          state.pagination = {
+            page: action.payload.page,
+            pages: action.payload.pages,
+            total: action.payload.total,
+          };
+        }
+      })
+      .addCase(fetchServciesByUserId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

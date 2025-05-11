@@ -22,11 +22,20 @@ api.interceptors.request.use(
 
 const createService = async (serviceData) => {
   try {
-    const response = await api.post("/", serviceData);
+    const response = await api.post("/", serviceData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: "Service creation failed" };
   }
+};
+
+const getServicesByUserId = async (userId) => {
+  const response = await api.get(`/user/${userId}`);
+  return response.data;
 };
 
 const getServices = async (params) => {
@@ -47,7 +56,7 @@ const updateService = async (id, serviceData) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await axios.put(`${API_URL}/${id}`, serviceData, config);
+  const response = await api.put(`/${id}`, serviceData, config);
   return response.data;
 };
 
@@ -58,7 +67,7 @@ const deleteService = async (id) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await axios.delete(`${API_URL}/${id}`, config);
+  const response = await api.delete(`/${id}`, config);
   return response.data;
 };
 
@@ -66,6 +75,7 @@ const serviceService = {
   createService,
   getServices,
   getServiceById,
+  getServicesByUserId,
   updateService,
   deleteService,
 };

@@ -1,11 +1,23 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchServciesByUserId, deleteService } from "../store/serviceSlice";
+import ServiceCard from "../components/buyer/ServiceCard";
 
 const RoleDashboard = () => {
   const [role, setRole] = useState("seller");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { services, loading, error } = useSelector((state) => state.services);
+  const { user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchServciesByUserId(user._id));
+    }
+  }, [dispatch, user]);
 
   const toggleRole = () => {
     setRole((prev) => {
@@ -13,7 +25,17 @@ const RoleDashboard = () => {
       if (role === "buyer") {
         navigate("/buyer");
       }
+      return role;
     });
+  };
+
+  const handleDelete = async (serviceId) => {
+    if (window.confirm("Are you sure you want to delete this service?")) {
+      const result = await dispatch(deleteService(serviceId));
+      if (!result.error) {
+        dispatch(fetchServciesByUserId(user._id));
+      }
+    }
   };
 
   return (
@@ -51,32 +73,37 @@ const RoleDashboard = () => {
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {[1, 2].map((id) => (
-            <motion.div
-              key={id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: id * 0.1 }}
-              className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-indigo-50 hover:border-indigo-100 shadow-xl hover:shadow-2xl transition-all duration-300"
-            >
-              <h2 className="text-2xl font-semibold mb-4 text-indigo-900">
-                Service #{id}
-              </h2>
-              <p className="text-lg text-indigo-800/70 mb-6">
-                Professional service description goes here.
-              </p>
-              <div className="flex justify-between items-center">
-                <button className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200">
-                  Edit Service
-                </button>
-                <button className="text-red-500 hover:text-red-700 font-medium transition-colors duration-200">
-                  Delete
-                </button>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-8">
+            {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="text-center text-indigo-600">Loading services...</div>
+        ) : (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {services.map((service) => (
+              <div key={service._id} className="relative group">
+                <ServiceCard {...service} />
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                  <Link
+                    to={`/edit-service/${service._id}`}
+                    className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(service._id)}
+                    className="text-red-500 hover:text-red-700 font-medium transition-colors duration-200 bg-white/90 px-4 py-2 rounded-lg"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   );

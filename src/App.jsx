@@ -10,6 +10,7 @@ import BuyerDashboard from "./components/buyer/BuyerDashboard";
 import ServiceDetail from "./pages/ServiceDetail";
 import HomePage from "./pages/HomePage";
 import AddService from "./pages/AddService";
+import EditService from "./pages/EditService";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { fetchCurrentUser } from "./store/authSlice";
 import { isAuthenticated } from "./utils/authUtils";
@@ -62,6 +63,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddService />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-service/:id"
+          element={
+            <ProtectedRoute>
+              <EditService />
             </ProtectedRoute>
           }
         />

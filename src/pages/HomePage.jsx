@@ -1,8 +1,25 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ServiceCard from "../components/buyer/ServiceCard";
+import { fetchServices } from "../store/serviceSlice";
 
 const HomePage = () => {
+  const dispatch = useDispatch();
+  const { services } = useSelector((state) => state.services);
+  const [randomServices, setRandomServices] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchServices({ page: 1, limit: 5 }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (services.length > 0) {
+      const shuffled = [...services].sort(() => 0.5 - Math.random());
+      setRandomServices(shuffled.slice(0, 5));
+    }
+  }, [services]);
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
       {/* Navbar */}
@@ -87,8 +104,8 @@ const HomePage = () => {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-16">
-            {[1, 2, 3, 2, 1].map((id) => (
-              <ServiceCard key={id} id={id} />
+            {randomServices.map((service) => (
+              <ServiceCard key={service._id} {...service} />
             ))}
           </div>
 

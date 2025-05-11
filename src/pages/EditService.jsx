@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { createService } from "../store/serviceSlice";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link, useParams } from "react-router-dom";
+import { updateService, fetchServiceById } from "../store/serviceSlice";
 
-const AddService = () => {
+const EditService = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { currentService, loading } = useSelector((state) => state.services);
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -16,6 +19,24 @@ const AddService = () => {
     tags: "",
     images: [],
   });
+
+  useEffect(() => {
+    dispatch(fetchServiceById(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (currentService) {
+      setFormData({
+        title: currentService.title || "",
+        description: currentService.description || "",
+        category: currentService.category || "",
+        price: currentService.price || "",
+        deliveryTime: currentService.deliveryTime || "",
+        tags: currentService.tags?.join(", ") || "",
+        images: [],
+      });
+    }
+  }, [currentService]);
 
   const categories = [
     "Design",
@@ -43,17 +64,23 @@ const AddService = () => {
     form.append("deliveryTime", formData.deliveryTime);
     form.append("tags", formData.tags);
 
-    // Safely handle image uploads
-
     for (let i = 0; i < formData.images.length; i++) {
       form.append("images", formData.images[i]);
     }
 
-    const result = await dispatch(createService(form)); // Pass FormData
+    const result = await dispatch(updateService({ id, serviceData: form }));
     if (!result.error) {
       navigate("/dashboard");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white">
+        <div className="text-2xl text-indigo-600">Loading service data...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
@@ -78,7 +105,7 @@ const AddService = () => {
         className="max-w-3xl mx-auto px-6 py-16"
       >
         <h1 className="text-4xl font-bold text-indigo-900 mb-12">
-          Add New Service
+          Edit Service
         </h1>
 
         <form
@@ -203,18 +230,18 @@ const AddService = () => {
                 }}
               />
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-indigo-200 mt-8"
-          >
-            Create Service
-          </button>
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white py-4 px-8 rounded-xl font-medium hover:bg-indigo-700 transition-all duration-300 shadow-xl hover:shadow-indigo-200"
+            >
+              Update Service
+            </button>
+          </div>
         </form>
       </motion.div>
     </div>
   );
 };
 
-export default AddService;
+export default EditService;
